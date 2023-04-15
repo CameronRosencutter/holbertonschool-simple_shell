@@ -46,30 +46,31 @@ int hsh_cd(char **args, char *input_stdin, int *exit_status)
 int delete_env_variable(const char *name)
 {
     /* Find the environment variable manually*/
-    size_t name_len = strlen(name);
-    char **envp = environ;
-    while (*envp != NULL)
-    {
-        if (strncmp(*envp, name, name_len) == 0 && (*envp)[name_len] == '=')
+	size_t name_len = strlen(name);
+	char **envp = environ;
+
+	while (*envp != NULL)
+
 	{
-            break;  /* found it!*/
-        }
-        envp++;
-    }
-    if (*envp == NULL)
-    {
-        perror("no such variable");
-        return 1;  /* indicate failure*/
-    }
+	if (strncmp(*envp, name, name_len) == 0 && (*envp)[name_len] == '=')
+		{
+		break;/* found it!*/
+		}
+	envp++;
+	}
+		if (*envp == NULL)
+		{
+			perror("no such variable");
+			return (1);  /* indicate failure*/
+		}
 
     /* Use unsetenv to delete the environment variable*/
-    if (unsetenv(name) != 0)
-    {
-        perror("unsetenv");
-        return 1;  /* indicate failure */
-    }
-
-    return 0;  /* indicate success*/
+if (unsetenv(name) != 0)
+{
+	perror("unsetenv");
+	return (1);  /* indicate failure */
+}
+return (0);  /* indicate success*/
 }
 
 /**
@@ -78,7 +79,6 @@ int delete_env_variable(const char *name)
 
 int hsh_setenv(char **args, char *input_stdin, int *exit_status)
 {
-
 	int n_tokens = 0;
 
 	(void)input_stdin;
@@ -100,7 +100,7 @@ int hsh_setenv(char **args, char *input_stdin, int *exit_status)
  * myFunction() - exit
  */
 
-int myFunction()
+int myFunction(void)
 {
-	return 2;
+	return (2);
 }
