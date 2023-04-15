@@ -40,109 +40,34 @@ int hsh_cd(char **args, char *input_stdin, int *exit_status)
 }
 
 /**
- * hsh_setenv - Env variable
- * @args: array tokens
- * @input_stdin: input stdin
- * @exit_status: exit
- * Return: 1
- */
-
-int hsh_setenv(char **args,  char *input_stdin, int *exit_status)
-{
-	int n_tokens = 0;
-
-	(void)input_stdin;
-	(void)exit_status;
-
-	while (args[n_tokens] != NULL)
-	{
-		n_tokens++;
-	}
-
-	if (n_tokens == 3)
-	{
-		setenv(args[1], args[2], 1);
-		return (0);
-	}
-	else if (n_tokens != 3)
-	{
-		/*may need write command*/
-		return (1);
-	}
-}
-
-/**
- * hsh_unsetenv - Delete an environment variable
- * @args: Array of tokens
- * @input_stdin: Input from stdin
- * @exit_status: Exit
- * Return: Return 1
+ * delete_env_variable - deletes environment variable
  */
 
 int delete_env_variable(const char *name)
 {
-	size_t name_len = strlen(name);
-	char **envp = environ;
-	while (*envp != NULL)
+    /* Find the environment variable manually*/
+    size_t name_len = strlen(name);
+    char **envp = environ;
+    while (*envp != NULL)
+    {
+        if (strncmp(*envp, name, name_len) == 0 && (*envp)[name_len] == '=')
 	{
-		if (strncmp(*envp, name, name_len) == 0 && (*envp)[name_len] == '=')
-		{
-				break; /* found it! */
-		}
-	envp++;
-	}
-	if (*envp == NULL) 
-	{
-		perror("no such variable");
-		return 1; /* indicate failure*/
-	}
+            break;  /* found it!*/
+        }
+        envp++;
+    }
+    if (*envp == NULL)
+    {
+        perror("no such variable");
+        return 1;  /* indicate failure*/
+    }
 
-	return 0; /* indicate sucess */
-}
+    /* Use unsetenv to delete the environment variable*/
+    if (unsetenv(name) != 0)
+    {
+        perror("unsetenv");
+        return 1;  /* indicate failure */
+    }
 
-/**
- * print_env - Function that print enviromental
- */
-
-void print_env(void)
-{
-	char **env;
-	for (env = environ; *env != NULL; env++)
-	{
-		write(1, *env, strlen(*env));
-		write(1,"\n",1); 
-	}
-}
-
-/**
- * hsh_exit - Function exit
- * @args: arguments
- * @input_stdin: input of stdin
- * @exit_status: exit status
- * Return: exit
- */
-
-int hsh_exit(char **args, char *input_stdin, int *exit_status)
-{
-	int output_exit = 0;
-
-	(void)args;
-	(void)input_stdin;
-	(void)exit_status;
-
-	if (args[1] == NULL)
-	{
-		free(args);
-		free(input_stdin);
-		exit(*exit_status);
-	}
-	if (args[2] != NULL)
-	{
-		/*may need write command*/
-		return (0);
-	}
-	output_exit = atoi(args[1]);
-	free(args);
-	free(input_stdin);
-	exit(output_exit);
+    return 0;  /* indicate success*/
 }
