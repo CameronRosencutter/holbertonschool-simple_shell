@@ -60,11 +60,15 @@ int hsh_setenv(char **args,  char *input_stdin, int *exit_status)
 	}
 
 	if (n_tokens == 3)
+	{
 		setenv(args[1], args[2], 1);
-
+		return (0);
+	}
 	else if (n_tokens != 3)
+	{
 		/*may need write command*/
-	return (1);
+		return (1);
+	}
 }
 
 /**
@@ -75,52 +79,39 @@ int hsh_setenv(char **args,  char *input_stdin, int *exit_status)
  * Return: Return 1
  */
 
-int hsh_unsetenv(char **args,  char *input_stdin, int *exit_status)
+int delete_env_variable(const char *name)
 {
-	int n_tokens = 0;
-
-	(void)input_stdin;
-	(void)exit_status;
-
-	while (args[n_tokens] != NULL)
+	size_t name_len = strlen(name);
+	char **envp = environ;
+	while (*envp != NULL)
 	{
-		n_tokens++;
+		if (strncmp(*envp, name, name_len) == 0 && (*envp)[name_len] == '=')
+		{
+				break; /* found it! */
+		}
+	envp++;
+	}
+	if (*envp == NULL) 
+	{
+		perror("no such variable");
+		return 1; /* indicate failure*/
 	}
 
-	if (n_tokens == 2)
-		unsetenv(args[1]);
-
-	else if (n_tokens != 2)
-		/*may need write command*/
-
-	return (1);
+	return 0; /* indicate sucess */
 }
 
 /**
- * hsh_env - Function that print enviromental
- * @args: arguments
- * @input_stdin: input
- * @exit_status: exit status
- * Return: 1
+ * print_env - Function that print enviromental
  */
 
-int hsh_env(char **args, char *input_stdin, int *exit_status)
+void print_env(void)
 {
-	int i = 0;
-
-	(void)args;
-	(void)input_stdin;
-	(void)exit_status;
-
-	if (environ[i] == NULL)
+	char **env;
+	for (env = environ; *env != NULL; env++)
 	{
-		/*May need write command here*/
-		return (1);
+		write(1, *env, strlen(*env));
+		write(1,"\n",1); 
 	}
-	for (i = 0; environ[i]; i++)
-		/*may need write command here*/
-
-	return (1);
 }
 
 /**

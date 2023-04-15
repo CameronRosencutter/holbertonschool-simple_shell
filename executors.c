@@ -8,7 +8,7 @@
  * Return: Always 1
  */
 
-nt hsh_execute(char **arguments, char **argv, int *exit_status)
+int hsh_execute(char **arguments, char **argv, int *exit_status)
 {
 	pid_t pid;
 	int status;
