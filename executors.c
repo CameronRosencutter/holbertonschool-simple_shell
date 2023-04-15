@@ -51,11 +51,11 @@ int hsh_execute(char **arguments, char **argv, int *exit_status)
  * @input_stdin: String
  * @argv: Array of arguments
  * @exit_status: Exit status
- * Return: Status 
+ * Return: Status
  */
 
 int hsh_execute_builtins(char **args, char *input_stdin,
-					 char **argv, int *exit_status)
+		char **argv, int *exit_status)
 
 {
 	int i = 0;
