@@ -47,24 +47,26 @@ int hsh_cd(char **args, char *input_stdin, int *exit_status)
  * Return: 1
  */
 
-int hsh_setenv(char **args,  char *input_stdin, int *exit_status)
+#include <unistd.h>
+#include <stdlib.h>
+
+int hsh_setenv(char **args, char *input_stdin, int *exit_status)
 {
 	int n_tokens = 0;
 
 	(void)input_stdin;
 	(void)exit_status;
-
+	
 	while (args[n_tokens] != NULL)
 	{
 		n_tokens++;
 	}
 
-	if (n_tokens == 3)
-		setenv(args[1], args[2], 1);
-
-	else if (n_tokens != 3)
-		/*may need write command*/
-	return (1);
+	 if (n_tokens == 3)
+		 setenv(args[1], args[2], 1);
+	  else if (n_tokens != 3)
+		  write(STDERR_FILENO, "hsh: setenv: wrong number of arguments\n", 41);
+	  return (1);
 }
 
 /**
