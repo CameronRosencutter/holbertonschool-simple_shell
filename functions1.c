@@ -20,16 +20,14 @@ void (*check_for_builtins(vars_t *vars))(vars_t *vars)
  * loop through the array of built-in
  *  commands and check if the first argument
  *  matches any of them
+ *  @check: new description
  */
 	for (i = 0; check[i].f != NULL; i++)
 	{
 		if (_strcmpr(vars->av[0], check[i].name) == 0)
 			break;
 	}
-/**
- * if a match is found, execute the corresponding
- * built-in function and it's return pointer
- */
+
 	if (check[i].f != NULL)
 		check[i].f(vars);
 
@@ -47,10 +45,8 @@ void new_exit(vars_t *vars)
 	{
 		/*convert the second argument to an integer using the "_atoi" function */
 		status = _atoi(vars->av[1]);
-/**
- * if the conversion is successful, set the exit status of the program
- * to the integer value
- */
+
+ /*if the conversion is successful, set exit*/
 		if (status != -1)
 			vars->status = status;
 /* if the conversion fails, set exit status to 2 and print an error message */
@@ -62,10 +58,7 @@ void new_exit(vars_t *vars)
 			_puts2("\n");
 		}
 	}
-/**
- * free memory allocated for the buffer, arguments, command lists,
- * and environment variables
- */
+/* free memory allocated for the buffer */
 	free(vars->buffer);
 	free(vars->av);
 	free(vars->commands);
@@ -104,20 +97,13 @@ void new_setenv(vars_t *vars)
 /* check if the second and third arguments of the function are not NULL */
 	if (vars->av[1] == NULL || vars->av[2] == NULL)
 	{
-/**
- * if they are NULL, print an error messange and set the exit status of
- * the program to 2
- */
 		print_errors(vars, ": Incorrect number of argments\n");
 		vars->status = 2;
 		return;
 	}
 /* call function "find_key" to search for key in environment variables */
 	key = find_key(vars->env, vars->[1]);
-/**
- * if the key is not found, call function called "add_key"
- * to add a new environment variable to the list
- */
+/* if the key is not found, call function called "add_key"*/
 	if (key == NULL)
 		add_key(vars);
 	else
