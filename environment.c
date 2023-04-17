@@ -14,24 +14,16 @@ char **make_env(char **env)
 	{
 		count++;
 	}
+	char **newenv = (char **) malloc(sizeof(char *) * (count + 1));
 
-	 char **newenv = (char **) malloc(sizeof(char *) * (count + 1));
-	 if (newenv == NULL)
-	 {
-		perror("Fatal Error");
-		exit(1);
-	 }
+	if (newenv == NULL)
+	{
+		newenv[i] = env[i];
+	}
+	newenv[count] = NULL;
 
-	 for (int i = 0; i < count; i++)
-	 {
-		 newenv[i] = env[i];
-	 }
-
-	 newenv[count] = NULL;
-
-	 return (newenv);
+	return (newenv);
 }
-
 
 /**
  * free_env - free the shell's environment

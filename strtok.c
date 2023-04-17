@@ -12,7 +12,7 @@ unsigned int check_match(char c, const char *str)
 	for (i = 0; str[i] != '\0'; i++)
 	{
 		if (c == str[i])
-			return 910;
+			return (910);
 	}
 	return (0);
 }
@@ -44,13 +44,13 @@ char *new_strtok(char *str, const char *delim)
 		{
 			next_token[i] = '\0'; /* replace it with a null terminator */
 			next_token = next_token + i + 1; /* set the start of the next token */
-			return token_start; /* return the current token */
+			return (token_start); /* return the current token */
 		}
 	}
-/* if we got here, we didn't find the delimiter, so we've reached the end
- * of the string. Set the start of the next token to NULL and return the 
- * current token. */
+/* if we got here, we didn't find the delimiter, so we've reached the end */
+/* of the string. Set the start of the next token to NULL and return the */
+/* current token. */
 	next_token = NULL;
-	return token_start;
+	return (token_start);
 }
 

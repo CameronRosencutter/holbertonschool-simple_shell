@@ -7,55 +7,46 @@
  */
 int path_execute(char *command, vars_t *vars)
 {
-	/* check if command is executable */
 	if (access(command, X_OK) != 0)
-	{ /* print error message and set status */
-		print_error(vars, ": Permission denied\n";
+	{
+		print_error(vars, ": Permission denied\n");
 		vars->status = 126;
-		return 0;
-	
+		return (0);
 	}
 	/* fork a child process */
 	pid_t child_pid = fork();
 	if (child_pid == -1)
-	{ /* print error message and set status */
+	{
 		print_error(vars, NULL);
 		vars->status = 1;
-		return 0;
+		return (0);
 	}
-
 	/* if child process, execute the command */
 	if (child_pid == 0)
 	{
-		if (execve(command, vars->av, vars->env) == -1
-		{ /* print error message and exit */
-			print_error(vars, NULL);
-			exit(1);
-		}
+		execve(command, vars->av, vars->env);
+		print_error(vars, NULL);
+		exit(1);
 	}
 	/* if parent process, wait for child process to finish */
+	wait(&vars->status);
+	/* set status based on exit status of child process */
+	if (WIFEXITED(vars->status))
+	{
+		vars->status = WEXITSTATUS(vars->status);
+	}
+
+	else if (WIFSIGNALED(vars->status) && WTERMSIG(vars->status) == SIGINT) 
+	{
+		vars->statu = 130;
+	}
 	else
 	{
-		wait(&vars->status);
-		/* set status based on exit status of child process */
-		if (WIFEXITED(vars->status))
-		{
-			vars->status = WEXITSTATUS(vars->status);
-		}
-		else if (WIFSIGNALED(vars->status) && WTERMSIG(vars->status) == SIGINT)
-		{
-			vars->status = 130;
-		}
-		else
-		{
-			vars->status = 1;
-		}
-		return 0;
-	}
-	/* if we get here, there was an error executing the command */
 		vars->status = 1;
-		return 0;
+	}
+	return (0);
 }
+
 /**
  * find_path - finds the PATH variable
  * @env: array of environment variables
