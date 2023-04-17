@@ -9,6 +9,7 @@
 char **make_env(char **env)
 {
 	int count = 0;
+
 	while (env[count] != NULL)
 	{
 		count++;
@@ -17,8 +18,8 @@ char **make_env(char **env)
 	 char **newenv = (char **) malloc(sizeof(char *) * (count + 1));
 	 if (newenv == NULL)
 	 {
-		 perror("Fatal Error");
-		 exit(1);
+		perror("Fatal Error");
+		exit(1);
 	 }
 
 	 for (int i = 0; i < count; i++)
