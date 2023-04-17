@@ -17,29 +17,27 @@ ssize_t _puts(char *str)
 /**
  * _strdup - returns pointer
  * @strtodup: string to be duplicated
+ *
  * Return: pointer
  */
 
-char *_strdup(char *input_string)
+char *_strdup(char *strtodup)
 {
-	if (input_string == NULL)
-	{
+	char *copy;
+
+	int len, i;
+
+	if (strtodup == 0)
 		return (NULL);
-	}
 
-	int length = 0;
+	for (len = 0; strtodup[len]; len++)
+		;
+	copy = malloc((len + 1) * sizeof(char));
 
-	while (input_string[length] != '\0')
-	{
-		length++;
-	}
+	for (i = 0; i <= len; i++)
+		copy[i] = strtodup[i];
 
-	 char *copy = malloc((length + 1) * sizeof(char));
-	 for (int i = 0; i <= length; i++)
-	 	{
-			copy[i] = input_string[i];
-	 	}
-	 return (copy);
+	return (copy);
 }
 
 /**
@@ -126,7 +124,8 @@ unsigned int _strlen(char *str)
 
 	len = 0;
 
-	for (len = 0; str[len]; len++);
+	for (len = 0; str[len]; len++)
+		;
 
 	return (len);
 }
