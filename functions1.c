@@ -2,7 +2,6 @@
 
 /**
  * check_for_builtins - checks if the command is a builtin
- * @check: the command to check
  * @vars: variable
  * Return: returns 1 if the command is a builtin, 0 otherwise
  */
