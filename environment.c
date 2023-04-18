@@ -1,36 +1,36 @@
 #include "shell.h"
-
 /**
- * make_env - make the shell environment
- * @env: environment
- * Return: pointer
+ * make_env - make the shell environment from the environment passed to main
+ * @env: environment passed to main
+ *
+ * Return: pointer to the new environment
  */
 
 char **make_env(char **env)
 {
-	int count = 0;
-	unsigned int i;
+	char **newenv = NULL;
+	size_t i;
 
-	while (env[count] != NULL)
-	{
-		count++;
-	}
-	char **newenv = (char **) malloc(sizeof(char *) * (count + 1));
-
+	for (i = 0; env[i] != NULL; i++)
+		;
+	newenv = malloc(sizeof(char *) * (i + 1));
 	if (newenv == NULL)
 	{
-		newenv[i] = env[i];
+		perror("Fatal Error");
+		exit(1);
 	}
-	newenv[count] = NULL;
-
+	for (i = 0; env[i] != NULL; i++)
+		newenv[i] = _strdup(env[i]);
+	newenv[i] = NULL;
 	return (newenv);
 }
-
 /**
  * free_env - free the shell's environment
- * @env: shells enviroment
+ * @env: shell's environment
+ *
  * Return: void
  */
+
 void free_env(char **env)
 {
 	unsigned int i;
