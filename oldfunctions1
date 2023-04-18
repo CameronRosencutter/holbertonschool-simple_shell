@@ -2,103 +2,114 @@
 
 /**
  * check_for_builtins - checks if the command is a builtin
- * @vars: variables
- *
- * Return: pointer to the function or NULL
+ * @vars: variable
+ * Return: returns 1 if the command is a builtin, 0 otherwise
  */
 void (*check_for_builtins(vars_t *vars))(vars_t *vars)
 {
 	unsigned int i;
+/* initialize the array of built-in commands */
 	builtins_t check[] = {
 		{"exit", new_exit},
 		{"env", _env},
 		{"setenv", new_setenv},
 		{"unsetenv", new_unsetenv},
-		{NULL, NULL}};
-
+		{NULL, NULL}
+	};
+/**
+ * loop through the array of built-in
+ *  commands and check if the first argument
+ *  matches any of them
+ *  @check: new description
+ */
 	for (i = 0; check[i].f != NULL; i++)
 	{
 		if (_strcmpr(vars->av[0], check[i].name) == 0)
 			break;
 	}
+
 	if (check[i].f != NULL)
 		check[i].f(vars);
+
 	return (check[i].f);
 }
-
 /**
- * new_exit - exit program
- * @vars: variables
- *
- * Return: void
+ * new_exit - exit the shell
+ * @vars: pointer to a struct of variables
  */
 void new_exit(vars_t *vars)
 {
 	int status;
-
+/* check if the first argument is "exit" and a second argument exists */
 	if (_strcmpr(vars->av[0], "exit") == 0 && vars->av[1] != NULL)
 	{
+		/*convert the second argument to an integer using the "_atoi" function */
 		status = _atoi(vars->av[1]);
-		if (status == -1)
+
+ /*if the conversion is successful, set exit*/
+		if (status != -1)
+			vars->status = status;
+/* if the conversion fails, set exit status to 2 and print an error message */
+		else
 		{
 			vars->status = 2;
 			print_error(vars, ": Illegal number: ");
 			_puts2(vars->av[1]);
 			_puts2("\n");
-			free(vars->commands);
-			vars->commands = NULL;
-			return;
 		}
-		vars->status = status;
 	}
+/* free memory allocated for the buffer */
 	free(vars->buffer);
 	free(vars->av);
 	free(vars->commands);
 	free_env(vars->env);
+/* exit the program with the exit status */
 	exit(vars->status);
 }
 
 /**
  * _env - prints the current environment
  * @vars: struct of variables
- *
- * Return: void.
+ * Return: void
  */
 void _env(vars_t *vars)
 {
 	unsigned int i;
-
-	for (i = 0; vars->env[i]; i++)
+/* loop through environment variables in "vars" struct using "for" loop */
+	for (i = 0; vars->[i]; i++)
 	{
+/* print environment variable to standard output using "_puts" function */
 		_puts(vars->env[i]);
 		_puts("\n");
 	}
+/* set the exit status of the program to 0 */
 	vars->status = 0;
 }
 
 /**
- * new_setenv - create a new environment variable, or edit an existing variable
+ * new_setenv - add or modify an environment variable
  * @vars: pointer to struct of variables
- *
- * Return: void
  */
 void new_setenv(vars_t *vars)
 {
 	char **key;
 	char *var;
-
+/* check if the second and third arguments of the function are not NULL */
 	if (vars->av[1] == NULL || vars->av[2] == NULL)
 	{
-		print_error(vars, ": Incorrect number of arguments\n");
+		print_errors(vars, ": Incorrect number of argments\n");
 		vars->status = 2;
 		return;
 	}
-	key = find_key(vars->env, vars->av[1]);
+/* call function "find_key" to search for key in environment variables */
+	key = find_key(vars->env, vars->[1]);
+/* if the key is not found, call function called "add_key"*/
 	if (key == NULL)
 		add_key(vars);
 	else
 	{
-		var = add_value(vars->av[1], vars->av[2]);
+		var = add_value(vars->av[1], vars->[2]);
+
 		if (var == NULL)
 		{
 			print_error(vars, NULL);
@@ -117,43 +128,30 @@ void new_setenv(vars_t *vars)
 /**
  * new_unsetenv - remove an environment variable
  * @vars: pointer to a struct of variables
- *
- * Return: void
  */
 void new_unsetenv(vars_t *vars)
 {
-	char **key, **newenv;
-
-	unsigned int i, j;
-
 	if (vars->av[1] == NULL)
 	{
 		print_error(vars, ": Incorrect number of arguments\n");
 		vars->status = 2;
 		return;
 	}
-	key = find_key(vars->env, vars->av[1]);
+
+	char **key = find_key(vars->env, vars->av[1]);
+
 	if (key == NULL)
 	{
 		print_error(vars, ": No variable to unset");
 		return;
 	}
-	for (i = 0; vars->env[i] != NULL; i++)
-		;
-	newenv = malloc(sizeof(char *) * i);
-	if (newenv == NULL)
+
+	while (*key != NULL)
 	{
-		print_error(vars, NULL);
-		vars->status = 127;
-		new_exit(vars);
+		*key = *(key + 1);
+		key++;
 	}
-	for (i = 0; vars->env[i] != *key; i++)
-		newenv[i] = vars->env[i];
-	for (j = i + 1; vars->env[j] != NULL; j++, i++)
-		newenv[i] = vars->env[j];
-	newenv[i] = NULL;
-	free(*key);
-	free(vars->env);
-	vars->env = newenv;
+
 	vars->status = 0;
 }
+

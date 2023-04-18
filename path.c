@@ -1,48 +1,41 @@
 #include "shell.h"
 /**
- * path_execute - execute a command in the path
+ * path_execute - executes a command in the path
  * @command: full path to the command
  * @vars: pointer to struct of variables
+ *
  * Return: 0 on success, 1 on failure
  */
 int path_execute(char *command, vars_t *vars)
 {
-	if (access(command, X_OK) != 0)
-	{
-		print_error(vars, ": Permission denied\n");
-		vars->status = 126;
-		return (0);
-	}
-	pid_t child_pid = fork();
+	pid_t child_pid;
 
-	if (child_pid == -1)
+	if (access(command, X_OK) == 0)
 	{
-		print_error(vars, NULL);
-		vars->status = 1;
-		return (0);
-	}
-	/* if child process, execute the command */
-	if (child_pid == 0)
-	{
-		execve(command, vars->av, vars->env);
-		print_error(vars, NULL);
-		exit(1);
-	}
-	/* if parent process, wait for child process to finish */
-	wait(&vars->status);
-	/* set status based on exit status of child process */
-	if (WIFEXITED(vars->status))
-	{
-		vars->status = WEXITSTATUS(vars->status);
-	}
-
-	else if (WIFSIGNALED(vars->status) && WTERMSIG(vars->status) == SIGINT)
-	{
-		vars->statu = 130;
+		child_pid = fork();
+		if (child_pid == -1)
+			print_error(vars, NULL);
+		if (child_pid == 0)
+		{
+			if (execve(command, vars->av, vars->env) == -1)
+				print_error(vars, NULL);
+		}
+		else
+		{
+			wait(&vars->status);
+			if (WIFEXITED(vars->status))
+				vars->status = WEXITSTATUS(vars->status);
+			else if (WIFSIGNALED(vars->status) && WTERMSIG(vars->status) == SIGINT)
+				vars->status = 130;
+			return (0);
+		}
+		vars->status = 127;
+		return (1);
 	}
 	else
 	{
-		vars->status = 1;
+		print_error(vars, ": Permission denied\n");
+		vars->status = 126;
 	}
 	return (0);
 }
@@ -50,119 +43,133 @@ int path_execute(char *command, vars_t *vars)
 /**
  * find_path - finds the PATH variable
  * @env: array of environment variables
+ *
  * Return: pointer to the node that contains the PATH, or NULL on failure
  */
 char *find_path(char **env)
 {
-	/* loop through environment variables */
-	for (int i = 0; env[i] != NULL; i++)
-	{ /* check if variable is "PATH" */
-		if (strncmp(env[i], "PATH=", 5) == 0)
-		{ /* return value of "PATH" variable */
-			return (env[i] + 5);
-		}
+	char *path = "PATH=";
+	unsigned int i, j;
+
+	for (i = 0; env[i] != NULL; i++)
+	{
+		for (j = 0; j < 5; j++)
+			if (path[j] != env[i][j])
+				break;
+		if (j == 5)
+			break;
 	}
-	/* "PATH" variable not found */
-	return (NULL);
+	return (env[i]);
 }
 /**
  * check_for_path - checks if the command is in the PATH
  * @vars: variables
- * Return: 0 on success, 1 on failure
+ *
+ * Return: void
  */
 void check_for_path(vars_t *vars)
 {
+	char *path, *path_dup = NULL, *check = NULL;
+	unsigned int i = 0, r = 0;
+	char **path_tokens;
+	struct stat buf;
+
 	if (check_for_dir(vars->av[0]))
+		r = execute_cwd(vars);
+	else
 	{
-		execute_cwd(vars);
-		return;
-	}
-	char *path = find_path(vars->env);
-
-	if (path != NULL)
-	{
-		char **path_tokens = tokenize(path + 5, ":");
-
-		for (int i = 0; path_tokens[i] != NULL; i++)
+		path = find_path(vars->env);
+		if (path != NULL)
 		{
-			char *command_path = _strcat(path_tokens[i], "/", vars->av[0]);
-
-			if (access(command_path, X_OK) == 0)
+			path_dup = _strdup(path + 5);
+			path_tokens = tokenize(path_dup, ":");
+			for (i = 0; path_tokens && path_tokens[i]; i++)
 			{
-				path_execute(command_path, vars);
-				free(command_path);
-				free(path_tokens);
-				return;
+				check = _strcat(path_tokens[i], vars->av[0]);
+				if (stat(check, &buf) == 0)
+				{
+					r = path_execute(check, vars);
+					free(check);
+					break;
+				}
 			}
-			free(command_path);
+			free(path_dup);
+			if (path_tokens == NULL)
+			{
+				vars->status = 127;
+				new_exit(vars);
+			}
+		}
+		if (path == NULL || path_tokens[i] == NULL)
+		{
+			print_error(vars, ": not found\n");
+			vars->status = 127;
 		}
 		free(path_tokens);
 	}
-
-	print_error(vars, ": not found\n");
-	vars->status = 127;
-	new_exit(vars);
+	if (r == 1)
+		new_exit(vars);
 }
 /**
  * execute_cwd - executes the command in the current working directory
- * @av: an array of strings containing the command and its arguments
- * @env: the environment variable
+ * @vars: pointer to struct of variables
+ *
  * Return: 0 on success, 1 on failure
  */
-int execute_cwd(char **av, char **env)
+int execute_cwd(vars_t *vars)
 {
 	pid_t child_pid;
+	struct stat buf;
 
-	if (access(av[0], F_OK) != 0)
+	if (stat(vars->av[0], &buf) == 0)
 	{
-		print_error(av[0], ": not found\n");
-		return (127);
-	}
-	if (access(av[0], X_OK) != 0)
-	{
-		print_error(av[0], ": Permission denied\n");
-		return (126);
-	}
-	child_pid = fork();
-
-	if (child_pid == -1)
-	{
-		print_error(NULL, "fork failed\n");
-		return (1);
-	}
-	if (child_pid == 0)
-	{
-		if (execve(av[0], av, env) == -1)
+		if (access(vars->av[0], X_OK) == 0)
 		{
-			print_error(av[0], ": not found\n");
-			exit(127);
+			child_pid = fork();
+			if (child_pid == -1)
+				print_error(vars, NULL);
+			if (child_pid == 0)
+			{
+				if (execve(vars->av[0], vars->av, vars->env) == -1)
+					print_error(vars, NULL);
+			}
+			else
+			{
+				wait(&vars->status);
+				if (WIFEXITED(vars->status))
+					vars->status = WEXITSTATUS(vars->status);
+				else if (WIFSIGNALED(vars->status) && WTERMSIG(vars->status) == SIGINT)
+					vars->status = 130;
+				return (0);
+			}
+			vars->status = 127;
+			return (1);
 		}
+		else
+		{
+			print_error(vars, ": Permission denied\n");
+			vars->status = 126;
+		}
+		return (0);
 	}
-	wait(NULL);
-	if (WIFEXITED(child_pid))
-	{
-		return (WEXITSTATUS(child_pid));
-	}
-	else if (WIFSIGNALED(child_pid) && WTERMSIG(child_pid) == SIGINT)
-	{
-		return (130);
-	}
-	return (1);
+	print_error(vars, ": not found\n");
+	vars->status = 127;
+	return (0);
 }
 /**
  * check_for_dir - checks if the command is a part of a path
  * @str: command
+ *
  * Return: 1 on success, 0 on failure
  */
 int check_for_dir(char *str)
 {
-	while (*str)
+	unsigned int i;
+
+	for (i = 0; str[i]; i++)
 	{
-		if (*str == '/')
+		if (str[i] == '/')
 			return (1);
-		str++;
 	}
 	return (0);
 }
-
-
