@@ -9,14 +9,15 @@ void add_key(vars_t *vars)
 	unsigned int i;
 	char **newenv;
 /* count the number of existing environment variables */
-	for (i = 0; vars->env[i] != NULL; i++);
+	for (i = 0; vars->env[i] != NULL; i++)
+		;
 /* allocate memory for a new environment array with room for a new variable */
-	newenv = malloc(sizeof(char *) * (i+2));
+	newenv = malloc(sizeof(char *) * (i + 2));
 	if (newenv == NULL)
 	{
 /* if malloc fails, print an error message and exit the program */
 		print_error(vars, NULL);
-		vars->status =127;
+		vars->status = 127;
 		new_exit(vars);
 	}
 /* copy all existing environment variables into the new array */
@@ -26,7 +27,7 @@ void add_key(vars_t *vars)
 	newenv[i] = add_value(vars->av[1], vars->av[2]);
 	if (newenv[i] == NULL)
 	{
-/* if adding the new variable fails, print an error message and exit the program */
+/* if adding the new variable fails, print an error */
 		print_error(vars, NULL);
 		free(vars->buffer);
 		free(vars->commands);
@@ -68,7 +69,8 @@ char **find_key(char **env, char *key)
 	return (NULL);
 }
 
-/** add_value - create a new environment variable string
+/**
+ * add_value - create a new environment variable string
  * @key: variable name
  * @value: variable value
  * Return: pointer to the new string;
@@ -85,8 +87,8 @@ char *add_value(char *key, char *value)
 	if (new == NULL)
 		return (NULL);
 /* copy key and value to new string, separated by '=' */
-	for (i = 0; key[i] != '\0\; i++)
-		new[i] = key[i];
+	for (i = 0; key[i] != '\0'; i++)
+		new[i] == key[i];
 	new[i] = '=';
 	for (j = 0; value[j] != '\0'; j++)
 		new[i + 1 + j] = value[j];
@@ -117,16 +119,15 @@ int _atoi(char *str)
 			return (-1);
 /* add the digit to the number */
 		num += str[i] - '0';
-/* check for overflow */
+		/* check for overflow */
 		if ((i == digits - 1) && (str[i] - '0' > INT_MAX % 10))
 			return (-1);
 		if ((i == digits - 2) && (str[i + 1] != '\0') && (num . INT_MAX / 10))
-			return(-1);
+			return (-1);
 	}
-/* check if there are extra characters in the string */
+	/* check if there are extra characters in the string */
 	if (i > digits)
 		return (-1);
 /* return the final number */
 	return (num);
 }
-
