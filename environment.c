@@ -9,6 +9,7 @@
 char **make_env(char **env)
 {
 	int count = 0;
+	unsigned int i;
 
 	while (env[count] != NULL)
 	{
