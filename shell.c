@@ -73,20 +73,3 @@ void sig_handler(int signum)
 		write(STDOUT_FILENO, "\n$ ", 3);
 	}
 }
-/**
- *main - main function
- *Return: Always(0)
- */
-int main(void)
-{
-	int st = 1;
-
-	signal(SIGINT, sig_handler);
-	while (st)
-		{
-		_getline();
-		_strtok();
-		_fork();
-		}
-	return (0);
-}
