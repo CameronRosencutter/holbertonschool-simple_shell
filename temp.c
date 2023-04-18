@@ -13,6 +13,10 @@ void add_key(vars_t *vars)
 		;
 /* allocate memory for a new environment array with room for a new variable */
 	newenv = malloc(sizeof(char *) * (i + 2));
+<<<<<<< HEAD
+=======
+
+>>>>>>> 6134702bff98507e0f7cce9b99afe59da84bbfcb
 	if (newenv == NULL)
 	{
 /* if malloc fails, print an error message and exit the program */
@@ -27,7 +31,11 @@ void add_key(vars_t *vars)
 	newenv[i] = add_value(vars->av[1], vars->av[2]);
 	if (newenv[i] == NULL)
 	{
+<<<<<<< HEAD
 /* if adding the new variable fails, print an error */
+=======
+/* if adding new variable fails, print an error message and exit the program */
+>>>>>>> 6134702bff98507e0f7cce9b99afe59da84bbfcb
 		print_error(vars, NULL);
 		free(vars->buffer);
 		free(vars->commands);
