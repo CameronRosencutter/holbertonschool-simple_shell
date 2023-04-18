@@ -1,17 +1,18 @@
 #include "shell.h"
+
+
 /**
  * _getline - function that used to read a string or a line
  * Return: 0
  */
 int _getline(void)
 {
-	char *string;
 	size_t size;
-	ssize_t bytes_read = 0;
+	size_t bytes_read = 0;
 	int i;
 
-	string = (char *)malloc(size);
-	if (bytes_read == -1)
+	char *string = (char *)malloc(50 * sizeof(char));;
+	if ((bytes_read = -1))
 	{
 		puts("hsh");
 	}

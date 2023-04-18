@@ -1,6 +1,7 @@
 #include "shell.h"
 
 
+
 /**
  * sig_handler - handles ^C signal interupt
  * @uuv: unused variable
@@ -10,7 +11,7 @@
 static void sig_handler(int uuv)
 {
 	unsigned int sig_flag;
-
+	sig_flag = 1;
 
 	(void)uuv;
 	if (sig_flag == 0)
