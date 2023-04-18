@@ -11,12 +11,13 @@ void add_key(vars_t *vars)
 /* count the number of existing environment variables */
 	for (i = 0; vars->env[i] != NULL; i++);
 /* allocate memory for a new environment array with room for a new variable */
-	newenv = malloc(sizeof(char *) * (i+2));
+	newenv = malloc(sizeof(char *) * (i + 2));
+
 	if (newenv == NULL)
 	{
 /* if malloc fails, print an error message and exit the program */
 		print_error(vars, NULL);
-		vars->status =127;
+		vars->status = 127;
 		new_exit(vars);
 	}
 /* copy all existing environment variables into the new array */
@@ -26,7 +27,7 @@ void add_key(vars_t *vars)
 	newenv[i] = add_value(vars->av[1], vars->av[2]);
 	if (newenv[i] == NULL)
 	{
-/* if adding the new variable fails, print an error message and exit the program */
+/* if adding new variable fails, print an error message and exit the program */
 		print_error(vars, NULL);
 		free(vars->buffer);
 		free(vars->commands);
@@ -68,7 +69,8 @@ char **find_key(char **env, char *key)
 	return (NULL);
 }
 
-/** add_value - create a new environment variable string
+/**
+ * add_value - create a new environment variable string
  * @key: variable name
  * @value: variable value
  * Return: pointer to the new string;
