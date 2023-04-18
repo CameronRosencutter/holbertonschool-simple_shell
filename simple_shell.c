@@ -1,6 +1,4 @@
 #include "shell.h"
-unsigned int sig_flag;
-
 
 /**
  * sig_handler - handles ^C signal interupt
@@ -10,11 +8,18 @@ unsigned int sig_flag;
 
 static void sig_handler(int uuv)
 {
+	unsigned int sig_flag;
+
+
 	(void)uuv;
 	if (sig_flag == 0)
+	{
 		_puts("\n$ ");
+	}
 	else
+	{
 		_puts("\n");
+	}
 }
 
 /**
