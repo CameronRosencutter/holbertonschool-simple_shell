@@ -8,11 +8,12 @@
 int _getline(void)
 {
 	size_t size;
-	size_t bytes_read = 0;
 	int i;
+	size_t bytes_read = 0;
 
-	char *string = (char *)malloc(50 * sizeof(char));;
-	if ((bytes_read = -1))
+	char *string = (char *)malloc(50 * sizeof(char));
+
+	if (bytes_read == (size_t)-1)
 	{
 		puts("hsh");
 	}

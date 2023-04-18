@@ -11,6 +11,7 @@
 static void sig_handler(int uuv)
 {
 	unsigned int sig_flag;
+
 	sig_flag = 1;
 
 	(void)uuv;
